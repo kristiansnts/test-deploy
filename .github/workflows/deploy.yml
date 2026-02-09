@@ -14,5 +14,16 @@ jobs:
       - name: Deploy to AAPanel
         run: |
           echo "=== Started to AAPanel ==="
-          curl -X POST ${{ secrets.AAPANEL_TRIGER }}
+          echo "Triggering webhook..."
+          response=$(curl -v -X POST \
+            -H "User-Agent: GitHub-Actions-Deploy/1.0" \
+            -H "Accept: application/json" \
+            -H "Cache-Control: no-cache" \
+            -w "\n\nHTTP Status: %{http_code}\nTotal Time: %{time_total}s\n" \
+            ${{ secrets.AAPANEL_TRIGER }} 2>&1)
+          echo "$response"
+          if echo "$response" | grep -q "Just a moment"; then
+            echo "❌ ERROR: Cloudflare challenge detected!"
+            exit 1
+          fi
           echo "=== Deploy to AAPanel Done ==="
