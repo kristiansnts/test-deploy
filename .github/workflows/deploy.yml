@@ -2,7 +2,7 @@ name: Deploy to AAPanel Test
 
 on:
   push:
-    tag: 'demo/*'
+    branches: [ main ]
 
 jobs:
   deploy:
@@ -10,18 +10,14 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-
-      - name: Build & Deploy Worker
-        uses: cloudflare/wrangler-action@v4
-        with:
-          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
       
       - name: Deploy to AAPanel
         run: |
           echo "=== Started to AAPanel ==="
           echo "Triggering webhook..."
           response=$(curl -v -X POST \
+            -H "CF-Access-Client-Id: 69c073f90f4bb0836d281f82016be175.access" \
+            -H "CF-Access-Client-Secret: 1b88844263d838007305aa0f19f6964b9f5aff4e95f4c9fd739d01c444e7beac" \
             -H "User-Agent: GitHub-Actions-Deploy/1.0" \
             -H "Accept: application/json" \
             -H "Cache-Control: no-cache" \
